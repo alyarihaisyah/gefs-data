@@ -28,6 +28,6 @@ for fxx in LEADS:
     out_nc   = Path(f"data/wjava_nc/{DATE}_{CYCLE}z_{MEM}_f{fxx:03d}_wjava.nc")
 
     # crop bbox (tanpa filter variabel → dijamin ada isi)
-    run(f"wgrib2 {grib} -small_grib {LON_MIN}:{LAT_MIN} {LON_MAX}:{LAT_MAX} {sub_grib}")
+    run(f"wgrib2 {grib} -small_grib {LON_MIN}:{LON_MAX} {LAT_MIN}:{LAT_MAX} {sub_grib}")
     # konversi ke NetCDF
     run(f"wgrib2 {sub_grib} -netcdf {out_nc} -nc4 -nc_nlev 1")
