@@ -22,7 +22,7 @@ def run(cmd: str):
 run_time = pd.Timestamp(f"{DATE} {CYCLE}:00")
 
 for fxx in LEADS:
-    H = Herbie(run_time, model="gefs", product="atmos", member=MEM, fxx=fxx)  # GEFS 0.5°
+    H = Herbie(run_time, model="gefs", product="atmos.5", member=MEM, fxx=fxx)
     grib = Path(H.download())
     sub_grib = Path(f"data/wjava_nc/{DATE}_{CYCLE}z_{MEM}_f{fxx:03d}_wjava.grib2")
     out_nc   = Path(f"data/wjava_nc/{DATE}_{CYCLE}z_{MEM}_f{fxx:03d}_wjava.nc")
