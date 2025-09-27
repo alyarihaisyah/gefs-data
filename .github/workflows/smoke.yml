@@ -1,0 +1,60 @@
+name: SMOKE TEST – fetch 1 file & commit
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (LFS ON)
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          persist-credentials: true
+
+      - name: Micromamba env (python + wgrib2 + eccodes)
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: gefs
+          create-args: >-
+            python=3.11
+            wgrib2
+            eccodes
+            pip
+          condarc: |
+            channels:
+              - conda-forge
+              - defaults
+          init-shell: bash
+
+      - name: Install herbie
+        shell: bash -l {0}
+        run: |
+          python -m pip install --upgrade pip
+          pip install herbie-data
+
+      - name: Run smoke test
+        shell: bash -l {0}
+        run: python fetch_smoke.py
+
+      - name: Track NetCDF with LFS & commit
+        shell: bash -l {0}
+        env:
+          GIT_AUTHOR_NAME: "github-actions[bot]"
+          GIT_AUTHOR_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
+          GIT_COMMITTER_NAME: "github-actions[bot]"
+          GIT_COMMITTER_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
+        run: |
+          git lfs track "*.nc"
+          git add .gitattributes
+          git add data/wjava_nc
+          if git diff --cached --quiet; then
+            echo "No new files."
+          else
+            git commit -m "SMOKE: add GEFS West Java f006/f012"
+            git push
+          fi
